@@ -6,7 +6,7 @@ Example Code
 
     from minglanglib import *
 
-    test = quick_split()\
+    test = quick_split()
     _input = '其基本思想为：假定分词词典中的最长词有i个汉字字符，则用被处理文档的当前字串中的前i个字作为匹配字段，查找字典。'
     print test.split(_input)
     
