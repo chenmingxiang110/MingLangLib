@@ -4,16 +4,19 @@ MingLangLib: A Natural Language Processing Toolkit
 ------
 Example Code
 
-from minglanglib import *
+    <pre>
+    from minglanglib import *
 
-test = quick_split()
-_input = 'Oh my god! What a wonderful day'
-print _input
-print test.split(_input)
-print "---------------------"
-_input = '通常简称为MM法。其基本思想为：假定分词词典中的最长词有i个汉字字符，则用被处理文档的当前字串中的前i个字作为匹配字段，查找字典。'
-print _input
-print test.split(_input)
+    test = quick_split()
+    _input = 'Oh my god! What a wonderful day'
+    print _input
+    print test.split(_input)
+    print "---------------------"
+    _input = '通常简称为MM法。其基本思想为：假定分词词典中的最长词有i个汉字字符，则用被处理文档的当前字串中的前i个字作为匹配字段，查找字典。'
+    print _input
+    print test.split(_input)
+    </pre>
+
 ------
 运行环境
 * numpy
