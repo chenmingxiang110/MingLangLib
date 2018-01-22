@@ -153,7 +153,7 @@ class quick_split:
             result.append(_str[i:i+10])
         return result
 
-    def partial_split(self,_input):
+    def partial_split(self,_input,adv_switch = True):
         if len(_input) == 0: return _input
         rough_split = []
         is_checked = []
@@ -207,19 +207,21 @@ class quick_split:
             else:
                 merged_result.append(rough_split[i])
 
-        if len(merged_result)>15:
-            print "Warning! Too many items to do advanced_merge!"
-            temp_merge_result = []
-            for i in xrange(0,len(merged_result),10):
-                temp_merge_result+=self.advanced_merge(merged_result[i:i+10])
-            merged_result = temp_merge_result
-            print " ".join(merged_result)
-        else:
-            merged_result = self.advanced_merge(merged_result)
+        if adv_switch:
+            if len(merged_result)>15:
+                print "Warning! Too many items to do advanced_merge!"
+                temp_merge_result = []
+                for i in xrange(0,len(merged_result),10):
+                    temp_merge_result+=self.advanced_merge(merged_result[i:i+10])
+                merged_result = temp_merge_result
+                print " ".join(merged_result)
+            else:
+                merged_result = self.advanced_merge(merged_result)
         return " ".join(merged_result)
         # result = split_helper(_input)
 
-    def split_sentence(self,_input):
+    def split_sentence(self,_input,adv_switch = True):
+        _input = _input.strip()
         if not isinstance(_input, unicode):
             _input = _input.decode('utf-8')
         # _input = _input.lower()
@@ -228,7 +230,7 @@ class quick_split:
             if _input[i] not in self.character_set:
                 special_character_positions.append(i)
         if len(special_character_positions) == 0:
-            return self.partial_split(_input)
+            return self.partial_split(_input,adv_switch)
         final_result = []
         for i in xrange(len(special_character_positions)):
             if i == 0:
@@ -238,9 +240,9 @@ class quick_split:
             if len(temp_input)<1:
                 final_result.append(_input[special_character_positions[i]])
             else:
-                final_result.append(self.partial_split(temp_input))
+                final_result.append(self.partial_split(temp_input,adv_switch))
                 final_result.append(_input[special_character_positions[i]])
-        final_result.append(self.partial_split(_input[special_character_positions[-1]+1:]))
+        final_result.append(self.partial_split(_input[special_character_positions[-1]+1:],adv_switch))
 
         i1 = 0
         i2 = 0
@@ -286,15 +288,29 @@ class sentiment_analyzer:
                 self.negative_words.add(word)
 
     def count_words(self, _input):
-        splitted_input = self.splitter.split_sentence(_input)
+        _input = _input.strip()
+        splitted_input = self.splitter.split_sentence(_input,adv_switch = False)
         splitted_input = splitted_input.split()
         pos_num = 0
         neg_num = 0
         for word in splitted_input:
             if word in self.positive_words: pos_num+=1
             if word in self.negative_words: neg_num+=1
-        return pos_num,neg_num
+        return pos_num,neg_num,len(_input)
 
     def get_score(self, _input):
-        pos_num,neg_num = self.count_words(_input)
-        return pos_num,neg_num
+        _input = _input.strip()
+        if not isinstance(_input, unicode):
+            _input = _input.decode('utf-8')
+        _input = _input.lower()
+        pos_num,neg_num,length = self.count_words(_input)
+        X = np.array([[pos_num,neg_num,length]])
+        Weights1 = np.array([[-1.90182692,-1.00246861,1.84768407,-3.64999117,1.03589266,2.31532596,2.89711564,1.98777375,-0.45237745,0.95548137],
+            [2.8486167,4.10382932,1.06056173,2.88157075,-1.37585019,-0.87110768,-2.26924785,2.01158528,1.16686712,2.7833062],
+            [0.24065763,-0.03765879,2.60870956,0.05527978,-0.00711582,-0.11916056,-0.16676489,3.87820933,-0.03177381,1.96674413]])
+        biases1 = np.array([[-1.68875263,0.23228552,-2.13660485,-3.11010808,-0.23813621,-0.76334739,-1.94071001,-4.59103548,1.25225239,-0.86990503]])
+        Weights2 = np.array([[-0.28296541],[-0.53647374],[ 0.02993459],[-0.39071311],[ 0.57038062],[ 0.33308203],[ 0.38660777],[ 0.04774547],[-0.73926376],[ 0.02830038]])
+        biases2 = np.array([[0.35243915]])
+        output1 = 1/(1+np.exp(X.dot(Weights1)+biases1))
+        output2 = 1/(1+np.exp(output1.dot(Weights2)+biases2))
+        return output2.reshape([-1])[0]
