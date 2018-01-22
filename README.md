@@ -5,7 +5,7 @@ MingLangLib: A Natural Language Processing Toolkit
 运行环境
 * numpy 1.12.1 （其他版本的numpy未测试，不过应该没问题）
 
-Example Code 1
+Example Code 1 分词
 
     from minglanglib import *
 
@@ -22,6 +22,21 @@ Output
     斯坦福大学 为 硅谷 （ Silicon Valley ） 的 形成 和 崛起 奠定 了 坚实 的 基础 。
     斯坦 福 大学 为 硅谷 （ Silicon Valley ） 的 形成 和 崛起 奠定 了 坚实 的 基础 。
     
+Example Code 2 情感分析 (输出结果：该句子情感为正面的概率）
+  
+    test = sentiment_analyzer()
+    _input = "0比3被逆转相对来说比0比1被逆转更难得，更别说还有中场开香槟，2年后成功复仇这些附带剧情。"
+    print test.get_score(_input)
+    
+Output
+
+    0.310471107867
+    
+------
+Version 0.3
+* 新增了情感分析模块
+* 支持混合语言
+* 以电商商品评价举例，好评/差评预测准确率约为79.5%
 ------
 Version 0.2
 * 提升了稳定性，增加了 split_sentence 函数的 advanced_merge 功能的开关，避免了不必要的运算。
