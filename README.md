@@ -12,8 +12,10 @@ Example Code 1
     test = quick_split()
     _input = '斯坦福大学为硅谷（Silicon Valley）的形成和崛起奠定了坚实的基础。'
     print test.split_sentence(_input)
-* adv_switch 确保了算法会不断搜索是否有组合词。若不需要此功能，可以关闭。
-    print test.split_sentence(_input, adv_switch = False)
+    
+注意：adv_switch 确保了算法会不断搜索是否有组合词。若不需要此功能，可以关闭。
+
+    print test.split_sentence(_input, adv_switch = False)
     
 Output
 
