@@ -19,6 +19,9 @@ class quick_split:
         self.web_dict_path = _path+"data2.txt"
         self.freq_words_path = _path+"freq_words.txt"
         self.character_path = _path+"hzpy-utf8.txt"
+        self.positive_words_path = _path+"all_positive.txt"
+        self.negative_words_path = _path+"all_negative.txt"
+
         self.personal_dict = {}
         self.web_dict = {}
         # 2/(1+exp(x/100))
@@ -39,11 +42,13 @@ class quick_split:
         with open(self.freq_words_path,'r') as f:
             for line in f:
                 word = line.strip().decode('utf-8')
+                word = word.replace(u'\ufeff', '')
                 self.freq_words.add(word)
         with open(self.personal_dict_path,'r') as f:
             for line in f:
                 line = line.strip().split(',')
                 words = line[0].decode('utf-8')
+                words = words.replace(u'\ufeff', '')
                 if len(words) < 2:
                     continue
                 if words in self.personal_dict: print "Warning! Repeating Words!"
@@ -52,6 +57,7 @@ class quick_split:
             for line in f:
                 line = line.strip().split(',')
                 words = line[0].decode('utf-8')
+                words = words.replace(u'\ufeff', '')
                 if len(words) < 2:
                     continue
                 if words in self.web_dict: print "Warning! Repeating Words!"
@@ -65,6 +71,25 @@ class quick_split:
         for item in self.personal_dict:
             if len(item)>self.max_length:
                 self.max_length = len(item)
+
+        with open(self.positive_words_path) as f:
+            for line in f:
+                line = line.strip()
+                word = line.decode('utf-8')
+                word = word.replace(u'\ufeff', '')
+                if len(word) > 1:
+                    self.freq_words.add(word)
+                if (word not in self.web_dict) and len(word)>1 :
+                    self.web_dict[word] = 1
+        with open(self.negative_words_path) as f:
+            for line in f:
+                line = line.strip()
+                word = line.decode('utf-8')
+                word = word.replace(u'\ufeff', '')
+                if len(word) > 1:
+                    self.freq_words.add(word)
+                if (word not in self.web_dict) and len(word)>1 :
+                    self.web_dict[word] = 1
 
     def isAlpha(self,word):
         try:
@@ -122,6 +147,12 @@ class quick_split:
         min_index = np.argmin(lengths)
         return results[min_index]
 
+    def force2split(self, _str):
+        result = []
+        for i in xrange(0,len(_str),10):
+            result.append(_str[i:i+10])
+        return result
+
     def partial_split(self,_input):
         if len(_input) == 0: return _input
         rough_split = []
@@ -151,9 +182,22 @@ class quick_split:
                 is_checked.append(1)
         assert len(rough_split) == len(is_checked)
 
+        # for i in xrange(len(rough_split)):
+        #     print rough_split[i]
+        #     print is_checked[i]
+
         for i in xrange(len(is_checked)):
             if is_checked[i] == 0:
-                rough_split[i] = self.split_helper(rough_split[i])[0]
+                if len(rough_split[i])>15:
+                    print "Warning! Too long to split:"
+                    print rough_split[i]
+                    _input_list = self.force2split(rough_split[i])
+                    result_list = []
+                    for _str in _input_list:
+                        result_list+=self.split_helper(_str)[0]
+                    rough_split[i]=result_list
+                else:
+                    rough_split[i] = self.split_helper(rough_split[i])[0]
 
         merged_result = []
         for i in xrange(len(is_checked)):
@@ -162,18 +206,29 @@ class quick_split:
                     merged_result.append(item)
             else:
                 merged_result.append(rough_split[i])
-        merged_result = self.advanced_merge(merged_result)
+
+        if len(merged_result)>15:
+            print "Warning! Too many items to do advanced_merge!"
+            temp_merge_result = []
+            for i in xrange(0,len(merged_result),10):
+                temp_merge_result+=self.advanced_merge(merged_result[i:i+10])
+            merged_result = temp_merge_result
+            print " ".join(merged_result)
+        else:
+            merged_result = self.advanced_merge(merged_result)
         return " ".join(merged_result)
         # result = split_helper(_input)
 
-    def split(self,_input):
+    def split_sentence(self,_input):
         if not isinstance(_input, unicode):
             _input = _input.decode('utf-8')
+        # _input = _input.lower()
         special_character_positions = []
         for i in xrange(len(_input)):
             if _input[i] not in self.character_set:
                 special_character_positions.append(i)
-        if len(special_character_positions) == 0: return self.partial_split(_input)
+        if len(special_character_positions) == 0:
+            return self.partial_split(_input)
         final_result = []
         for i in xrange(len(special_character_positions)):
             if i == 0:
@@ -186,9 +241,6 @@ class quick_split:
                 final_result.append(self.partial_split(temp_input))
                 final_result.append(_input[special_character_positions[i]])
         final_result.append(self.partial_split(_input[special_character_positions[-1]+1:]))
-
-        # temp = (" ".join(final_result)).split()
-        # print " ".join(temp)
 
         i1 = 0
         i2 = 0
@@ -208,3 +260,41 @@ class quick_split:
                 i1+=1
         temp = (" ".join(final_result)).split()
         return " ".join(temp)
+
+class sentiment_analyzer:
+    def __init__(self):
+        self.splitter = quick_split()
+
+        _path = os.path.dirname(os.path.abspath(__file__))
+        _path = "/".join(_path.split('/')[:-1])+"/data/"
+        positive_words_path = _path+"all_positive.txt"
+        negative_words_path = _path+"all_negative.txt"
+
+        self.positive_words = set()
+        self.negative_words = set()
+        with open(positive_words_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                word = line.decode('utf-8')
+                word = word.replace(u'\ufeff', '')
+                self.positive_words.add(word)
+        with open(negative_words_path, 'r') as f:
+            for line in f:
+                line = line.strip()
+                word = line.decode('utf-8')
+                word = word.replace(u'\ufeff', '')
+                self.negative_words.add(word)
+
+    def count_words(self, _input):
+        splitted_input = self.splitter.split_sentence(_input)
+        splitted_input = splitted_input.split()
+        pos_num = 0
+        neg_num = 0
+        for word in splitted_input:
+            if word in self.positive_words: pos_num+=1
+            if word in self.negative_words: neg_num+=1
+        return pos_num,neg_num
+
+    def get_score(self, _input):
+        pos_num,neg_num = self.count_words(_input)
+        return pos_num,neg_num
