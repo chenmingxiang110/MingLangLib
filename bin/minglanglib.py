@@ -9,6 +9,7 @@
 import os
 import math
 import numpy as np
+import warnings
 
 class quick_split:
 
@@ -298,19 +299,27 @@ class sentiment_analyzer:
             if word in self.negative_words: neg_num+=1
         return pos_num,neg_num,len(_input)
 
+    def calc_score(self, stats):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            pos_num,neg_num,length = stats
+            X = np.array([[pos_num,neg_num,length]])
+            Weights1 = np.array([[-1.90182692,-1.00246861,1.84768407,-3.64999117,1.03589266,2.31532596,2.89711564,1.98777375,-0.45237745,0.95548137],
+                [2.8486167,4.10382932,1.06056173,2.88157075,-1.37585019,-0.87110768,-2.26924785,2.01158528,1.16686712,2.7833062],
+                [0.24065763,-0.03765879,2.60870956,0.05527978,-0.00711582,-0.11916056,-0.16676489,3.87820933,-0.03177381,1.96674413]],dtype = np.float64)
+            biases1 = np.array([[-1.68875263,0.23228552,-2.13660485,-3.11010808,-0.23813621,-0.76334739,-1.94071001,-4.59103548,1.25225239,-0.86990503]],dtype = np.float64)
+            Weights2 = np.array([[-0.28296541],[-0.53647374],[ 0.02993459],[-0.39071311],[ 0.57038062],[ 0.33308203],[ 0.38660777],[ 0.04774547],[-0.73926376],[ 0.02830038]],dtype = np.float64)
+            biases2 = np.array([[0.35243915]])
+
+            output1 = 1/(1+np.exp(X.dot(Weights1)+biases1))
+            output2 = 1/(1+np.exp(output1.dot(Weights2)+biases2))
+            return output2.reshape([-1])[0]
+
     def get_score(self, _input):
         _input = _input.strip()
         if not isinstance(_input, unicode):
             _input = _input.decode('utf-8')
         _input = _input.lower()
         pos_num,neg_num,length = self.count_words(_input)
-        X = np.array([[pos_num,neg_num,length]])
-        Weights1 = np.array([[-1.90182692,-1.00246861,1.84768407,-3.64999117,1.03589266,2.31532596,2.89711564,1.98777375,-0.45237745,0.95548137],
-            [2.8486167,4.10382932,1.06056173,2.88157075,-1.37585019,-0.87110768,-2.26924785,2.01158528,1.16686712,2.7833062],
-            [0.24065763,-0.03765879,2.60870956,0.05527978,-0.00711582,-0.11916056,-0.16676489,3.87820933,-0.03177381,1.96674413]])
-        biases1 = np.array([[-1.68875263,0.23228552,-2.13660485,-3.11010808,-0.23813621,-0.76334739,-1.94071001,-4.59103548,1.25225239,-0.86990503]])
-        Weights2 = np.array([[-0.28296541],[-0.53647374],[ 0.02993459],[-0.39071311],[ 0.57038062],[ 0.33308203],[ 0.38660777],[ 0.04774547],[-0.73926376],[ 0.02830038]])
-        biases2 = np.array([[0.35243915]])
-        output1 = 1/(1+np.exp(X.dot(Weights1)+biases1))
-        output2 = 1/(1+np.exp(output1.dot(Weights2)+biases2))
-        return output2.reshape([-1])[0]
+        stats = pos_num,neg_num,length
+        return self.calc_score(stats)
