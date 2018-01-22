@@ -313,7 +313,17 @@ class sentiment_analyzer:
 
             output1 = 1/(1+np.exp(X.dot(Weights1)+biases1))
             output2 = 1/(1+np.exp(output1.dot(Weights2)+biases2))
-            return output2.reshape([-1])[0]
+
+            result = output2.reshape([-1])[0]
+            result = result*2.0-1.0
+            result /= 0.68
+
+            if result>1.0:
+                result = 1.0
+            if result<-1.0:
+                result = -1.0
+            result = (result+1.0)/2.0
+            return result
 
     def get_score(self, _input):
         _input = _input.strip()
