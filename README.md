@@ -40,7 +40,7 @@ Version 0.3
 * 新增了情感分析模块
 * 支持混合语言
 * 以电商商品评价举例，好评/差评预测准确率约为79.5%（参考数据：data/sentiment/test_sentences_100pos_100neg.txt，前一百个为好评，后一百个为差评）
-* 由于数据量较小，该算法是基于词语情感极性词典的，并使用了小型 Neural Network 作为辅助，而非目前较为普遍的 Recurrent Neural Network。
+* 由于数据量较小，该算法是基于词语情感极性词典的，并使用了小型 Neural Network 作为辅助，而非目前较为普遍的 Recurrent Neural Network。但也因此支持更广泛的数据来源，不局限于商品评价和论坛回帖。
 ------
 Version 0.2
 * 提升了稳定性，增加了 split_sentence 函数的 advanced_merge 功能的开关，避免了不必要的运算。
