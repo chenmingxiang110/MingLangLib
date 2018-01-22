@@ -8,7 +8,7 @@ Example Code
 
     test = quick_split()
     _input = '斯坦福大学为硅谷（Silicon Valley）的形成和崛起奠定了坚实的基础。'
-    print test.split(_input)
+    print test.split_sentence(_input)
     
 Output
 
