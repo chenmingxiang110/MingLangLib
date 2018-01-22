@@ -9,9 +9,9 @@ Example Code 1 分词
 
     from minglanglib import *
 
-    test = quick_split()
+    qs = quick_split()
     _input = '斯坦福大学为硅谷（Silicon Valley）的形成和崛起奠定了坚实的基础。'
-    print test.split_sentence(_input)
+    print qs.split_sentence(_input)
     
   注意：adv_switch 确保了算法会不断搜索是否有组合词。若不需要此功能，可以关闭。
 
@@ -26,13 +26,14 @@ Example Code 2
 
   情感分析模块。输出结果：该句子情感为正面的概率）
 
-    test = sentiment_analyzer()
-    _input = "0比3被逆转相对来说比0比1被逆转更难得，更别说还有中场开香槟，2年后成功复仇这些附带剧情。"
-    print test.get_score(_input)
+    sa = sentiment_analyzer()
+    _input = "这谈判团队真业余，一开始的风声的3000万+姆希塔良，后来再变成1000万，"+
+        "现在又成平换了，不要告诉我这是为了照顾姆希塔良情绪主动不要钱？ 再给他开个20万的周薪我就真笑了 "
+    print sa.get_score(_input)
     
 Output
 
-    0.310471107867
+    0.382575117931
     
 ------
 Version 0.3
