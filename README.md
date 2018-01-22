@@ -22,9 +22,11 @@ Output
     斯坦福大学 为 硅谷 （ Silicon Valley ） 的 形成 和 崛起 奠定 了 坚实 的 基础 。
     斯坦 福 大学 为 硅谷 （ Silicon Valley ） 的 形成 和 崛起 奠定 了 坚实 的 基础 。
     
-Example Code 2 （情感分析模块。输出结果：该句子情感为正面的概率）
+Example Code 2
 
-    test = sentiment_analyzer()
+  情感分析模块。输出结果：该句子情感为正面的概率）
+
+    test = sentiment_analyzer()
     _input = "0比3被逆转相对来说比0比1被逆转更难得，更别说还有中场开香槟，2年后成功复仇这些附带剧情。"
     print test.get_score(_input)
     
