@@ -2,6 +2,9 @@ MingLangLib: A Natural Language Processing Toolkit
 =====
 汉语自然语言处理包
 ------
+运行环境
+* numpy 1.12.1 （其他版本的numpy未测试，不过应该没问题）
+
 Example Code 1
 
     from minglanglib import *
@@ -17,9 +20,6 @@ Output
     斯坦福大学 为 硅谷 （ Silicon Valley ） 的 形成 和 崛起 奠定 了 坚实 的 基础 。
     斯坦 福 大学 为 硅谷 （ Silicon Valley ） 的 形成 和 崛起 奠定 了 坚实 的 基础 。
     
-------
-运行环境
-* numpy 1.12.1 （其他版本的numpy未测试，不过应该没问题）
 ------
 Version 0.2
 * 提升了稳定性，增加了 split_sentence 函数的 advanced_merge 功能的开关，避免了不必要的运算。
