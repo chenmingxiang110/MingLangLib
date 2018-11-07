@@ -3,7 +3,7 @@ MingLangLib: A Natural Language Processing Toolkit
 汉语自然语言处理包
 ------
 运行环境
-* numpy 1.12.1 （其他版本的numpy未测试，不过应该没问题）
+* numpy 1.12.1 （其他版本的numpy未测试）
 
 Example Code 1 分词
 
